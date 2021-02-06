@@ -1,5 +1,7 @@
 import morgan from "morgan";
-import express from "express";
+import cors from "cors";
+import helmet from "helmet";
+import express, { NextFunction, Request, Response } from "express";
 import { router } from "./routes";
 
 class Server {
@@ -14,6 +16,15 @@ class Server {
 
     private middlewares() {
         this.app.use(morgan("dev"));
+        this.app.use(express.json());
+        this.app.use(
+            (err: Error, req: Request, res: Response, next: NextFunction) => {
+                res.status(500);
+                res.send("Oops, something went wrong 😿");
+            }
+        );
+        // this.app.use(cors());
+        // this.app.use(helmet());
     }
 
     public start(port: number) {
