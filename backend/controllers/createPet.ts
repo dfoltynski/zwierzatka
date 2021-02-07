@@ -9,7 +9,16 @@ import randomizePetPhoto from "../utils/tmp/randomizePetPhoto";
 // import randomizeOwnerRef from "../utils/tmp/randomizeOwnerRef";
 
 const createOwner = (req: Request, res: Response) => {
-    let { name, birth, breed, gender, color, photo, owner_ref } = req.body;
+    let {
+        name,
+        birth,
+        breed,
+        gender,
+        color,
+        photo,
+        owner_ref,
+        weight,
+    } = req.body;
     (async () => {
         try {
             name = randomizePetName();
@@ -19,9 +28,9 @@ const createOwner = (req: Request, res: Response) => {
             photo = await randomizePetPhoto();
             // owner_ref = randomizeOwnerRef();
 
-            const query = `INSERT INTO Pet (pet_name, pet_birth, breed, pet_gender, color, photo, owner_ref) VALUES ('${name}', '${birth}', '${breed}', '${gender}', '${color}', '${
+            const query = `INSERT INTO Pet (pet_name, pet_birth, breed, pet_gender, color, photo, owner_ref, weight) VALUES ('${name}', '${birth}', '${breed}', '${gender}', '${color}', '${
                 photo || null
-            }', '${owner_ref}')`;
+            }', '${owner_ref}', '${weight}')`;
 
             console.log(query);
 

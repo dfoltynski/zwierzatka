@@ -4,8 +4,11 @@ import helmet from "helmet";
 import express, { NextFunction, Request, Response } from "express";
 import session from "express-session";
 import passport from "passport";
+import dotenv from "dotenv";
 
 import { router } from "./routes";
+
+dotenv.config();
 
 class Server {
     private app;
@@ -18,14 +21,20 @@ class Server {
     }
 
     private middlewares() {
+        // if (this.app.get("env") === "production") {
+        // this.app.set("trust proxy", 1); // trust first proxy
+        // session.cookie.secure = true; // serve secure cookies
+        // }
+
         this.app.use(morgan("dev"));
         this.app.use(express.json());
 
         this.app.use(
             session({
-                secret: "secret session",
+                secret: process.env.SECRET,
                 resave: true,
                 saveUninitialized: true,
+                cookie: { maxAge: 3600000 }, // 1 hour
             })
         );
         this.app.use(passport.initialize());

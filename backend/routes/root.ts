@@ -6,6 +6,7 @@ import {
     authOk,
     authFail,
     createPet,
+    getBasicPetData,
 } from "../controllers";
 
 const router = express.Router();
@@ -21,6 +22,7 @@ router.post("/owner/", createOwner);
 router.post("/login/", passportLogin);
 
 router.post("/pet/", createPet);
+router.get("/pet/", getBasicPetData);
 
 router.get("/authok/", authOk);
 router.get("/authfail/", authFail);
