@@ -5,6 +5,7 @@ import {
     passportLogin,
     authOk,
     authFail,
+    createPet,
 } from "../controllers";
 
 const router = express.Router();
@@ -18,6 +19,8 @@ router.get("/test-secret", isAuth, (req, res) => {
 
 router.post("/owner/", createOwner);
 router.post("/login/", passportLogin);
+
+router.post("/pet/", createPet);
 
 router.get("/authok/", authOk);
 router.get("/authfail/", authFail);

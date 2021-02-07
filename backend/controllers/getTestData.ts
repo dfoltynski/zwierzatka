@@ -3,25 +3,22 @@ import { idText } from "typescript";
 import db from "../dbConfig";
 
 interface Owner {
-    email: string;
-    password: string;
+    name: string;
+    pet_name: string;
 }
 
 const welcome = (req: express.Request, res: express.Response) => {
-    let ownerObject: Owner = { email: "", password: "" };
+    let ownerObject: Owner = { name: "", pet_name: "" };
     db.query(
-        "SELECT email, password FROM Owner WHERE email LIKE 'robert@robert.com'",
+        "SELECT Owner.owner_name, Pet.pet_name FROM Pet INNER JOIN Owner ON Pet.owner_ref=Owner.owner_id WHERE Owner.email LIKE 'teset@test.com';",
         (err, data) => {
             if (err) throw err;
             data.rows.forEach((owner) => {
-                // console.log(owner.email, owner.password);
+                console.log(owner);
 
-                ownerObject.email = owner.email;
-                ownerObject.password = owner.password;
+                ownerObject.name = owner.owner_name;
+                ownerObject.pet_name = owner.pet_name;
             });
-
-            if (!ownerObject.email) {
-            }
 
             res.json(ownerObject);
         }
