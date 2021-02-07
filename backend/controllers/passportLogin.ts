@@ -53,18 +53,18 @@ passport.use(
     })
 );
 
-passport.serializeUser((user, done) => {
+passport.serializeUser((user: Owner, done) => {
     // console.log("serialize: ", user);
 
-    done(null, user);
+    done(null, user.id);
 });
 
-passport.deserializeUser((user: Owner, done) => {
-    // console.log("deserialize: ", user.id);
-    db.query(`SELECT * FROM Owner WHERE owner_id='${user.id}'`, (err, data) => {
+passport.deserializeUser((id, done) => {
+    console.log("deserialize2: ", id);
+    db.query(`SELECT * FROM Owner WHERE owner_id='${id}'`, (err, data) => {
         // console.log(data.rows);
 
-        done(err, data);
+        done(err, data.rows);
     });
 });
 
