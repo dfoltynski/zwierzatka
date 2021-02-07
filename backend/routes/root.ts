@@ -1,28 +1,25 @@
 import express from "express";
-import { getTestData, createOwner, passportLogin } from "../controllers";
-// import * as passport from "passport";
-import isAuth from "../utils/auth";
+import {
+    getTestData,
+    createOwner,
+    passportLogin,
+    authOk,
+    authFail,
+} from "../controllers";
+
 const router = express.Router();
 
+import isAuth from "../utils/auth";
+
 router.get("/", getTestData);
+router.get("/test-secret", isAuth, (req, res) => {
+    res.send("treasure");
+});
 
 router.post("/owner/", createOwner);
 router.post("/login/", passportLogin);
 
-router.get("/authok/", (req, res) => {
-    console.log(req);
-
-    res.send("auth ok");
-    // res.status(200);
-});
-
-router.get("/authfail/", (req, res) => {
-    res.send("auth fail");
-    // res.status(400);
-});
-
-router.get("/test-secret", isAuth, (req, res) => {
-    res.send("treasure");
-});
+router.get("/authok/", authOk);
+router.get("/authfail/", authFail);
 
 export default router;
