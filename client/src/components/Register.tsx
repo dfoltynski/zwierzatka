@@ -14,6 +14,9 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function Login() {
   const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+  const passwordMinimum = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+  const passwordMid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+  const passwordStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
   const [name, setName] = useState<string>("");
   const [validName, setValidName] = useState<boolean>(true);
@@ -22,6 +25,7 @@ export default function Login() {
   const [validEmail, setValidEmail] = useState<boolean>(true);
 
   const [password, setPassword] = useState<string>("");
+  const [validPassword, setValidPassword] = useState<boolean>(true);
 
   const [gender, setGender] = useState<string>("");
 
@@ -51,6 +55,12 @@ export default function Login() {
     return false;
   };
 
+  const validatePassword = (password: string): boolean => {
+    if (password.trim().match(passwordMinimum)) return true;
+    setValidPassword(false);
+    return false;
+  };
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -74,10 +84,15 @@ export default function Login() {
         }}
       />
       <TextInput
-        style={styles.formTextInput}
+        style={validPassword ? styles.formTextInput : styles.invalidText}
         placeholder="password"
         secureTextEntry={true}
-        onChangeText={(password) => setPassword(password)}
+        onChangeText={(password) => {
+          if (validatePassword(password)) {
+            setValidPassword(true);
+            setPassword(password);
+          }
+        }}
       />
       <DateTimePicker
         value={new Date()}
