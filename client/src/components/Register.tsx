@@ -26,6 +26,9 @@ export default function Login() {
 
   const [password, setPassword] = useState<string>("");
   const [validPassword, setValidPassword] = useState<boolean>(true);
+  const [passwordStrength, setPasswordStrength] = useState<string | undefined>(
+    ""
+  );
 
   const [gender, setGender] = useState<string>("");
 
@@ -57,8 +60,18 @@ export default function Login() {
 
   const validatePassword = (password: string): boolean => {
     if (password.trim().match(passwordMinimum)) return true;
+    if (password.trim().match(passwordMid)) return true;
+    if (password.trim().match(passwordStrong)) return true;
     setValidPassword(false);
+    setPasswordStrength(undefined);
+
     return false;
+  };
+
+  const checkPasswordStrength = (password: string): void => {
+    if (password.trim().match(passwordMinimum)) setPasswordStrength("Low");
+    if (password.trim().match(passwordMid)) setPasswordStrength("Medium");
+    if (password.trim().match(passwordStrong)) setPasswordStrength("Strong");
   };
 
   return (
@@ -90,10 +103,15 @@ export default function Login() {
         onChangeText={(password) => {
           if (validatePassword(password)) {
             setValidPassword(true);
+            checkPasswordStrength(password);
             setPassword(password);
           }
+          checkPasswordStrength("");
         }}
       />
+
+      <Text>{passwordStrength}</Text>
+
       <DateTimePicker
         value={new Date()}
         mode="date"
