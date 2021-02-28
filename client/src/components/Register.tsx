@@ -41,7 +41,7 @@ export default function Register() {
 
   const [gender, setGender] = useState<string>("");
 
-  const [date, setDate] = useState<Date>(
+  const [birth, setBirth] = useState<Date | string>(
     new Date(
       new Date().getFullYear() - 16,
       new Date().getMonth() + 1,
@@ -90,7 +90,8 @@ export default function Register() {
         email,
         password,
         name,
-        date: date.toISOString().split("T")[0],
+        birth,
+        gender,
       });
       console.log("valid email: ", validEmail);
       console.log("valid password: ", validPassword);
@@ -102,7 +103,8 @@ export default function Register() {
           email,
           password,
           name,
-          date: date.toString().split("T")[0],
+          birth,
+          gender,
         });
       } catch (error) {
         console.log(error);
@@ -192,7 +194,7 @@ export default function Register() {
       <Text>{passwordStrength}</Text>
 
       <DateTimePicker
-        value={date}
+        value={birth}
         mode="date"
         display="default"
         style={styles.dateInput}
@@ -204,7 +206,7 @@ export default function Register() {
           )
         }
         onChange={(ev: Event, date: Date) => {
-          setDate(date);
+          setBirth(date.toISOString().split("T")[0]);
         }}
       />
 
