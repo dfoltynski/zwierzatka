@@ -11,15 +11,21 @@ import { TextInput } from "react-native-gesture-handler";
 
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
+// import * as ImagePicker from "expo-image-picker";
 
-export default function Login() {
+import env from "../../config/env";
+
+export default function Register() {
+  // email and passowrd strength regexs
+
   const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
   const passwordMinimum = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   const passwordMid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
   const passwordStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-  const [image, setImage] = useState(null);
+  // waiting for resolving M1 problems with opening gallery ios
+  // const [image, setImage] = useState(null);
 
   const [name, setName] = useState<string>("");
   const [validName, setValidName] = useState<boolean>(true);
@@ -33,24 +39,31 @@ export default function Login() {
     ""
   );
 
-  useEffect(() => {
-    (async () => {
-      if (Platform.OS !== "web") {
-        const {
-          status,
-        } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          alert("Sorry, we need camera roll permissions to make this work!");
-        }
-      }
-    })();
-  }, []);
-
   const [gender, setGender] = useState<string>("");
 
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date>(
+    new Date(
+      new Date().getFullYear() - 16,
+      new Date().getMonth() + 1,
+      new Date().getDate()
+    )
+  );
 
-  const handleSubmit = (e: NativeSyntheticEvent<NativeTouchEvent>) => {
+  // waiting for resolving M1 problems with opening gallery ios
+  // useEffect(() => {
+  //   (async () => {
+  //     if (Platform.OS !== "web") {
+  //       const {
+  //         status,
+  //       } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  //       if (status !== "granted") {
+  //         alert("Sorry, we need camera roll permissions to make this work!");
+  //       }
+  //     }
+  //   })();
+  // }, []);
+
+  const handleSubmit = async (e: NativeSyntheticEvent<NativeTouchEvent>) => {
     if (email === "") {
       setValidEmail(false);
     }
@@ -70,16 +83,34 @@ export default function Login() {
       validName &&
       gender !== ""
     ) {
-      console.log("-----------------------------------------------------");
-      console.log("gender: ", gender);
-      console.log("email: ", email);
-      console.log("password: ", password);
-      console.log("date: ", date);
+      console.log(
+        `--------------------${env.REACT_NATIVE_API_URL}/owner-------------------------`
+      );
+      console.log({
+        email,
+        password,
+        name,
+        date: date.toISOString().split("T")[0],
+      });
       console.log("valid email: ", validEmail);
+      console.log("valid password: ", validPassword);
+      console.log("valid name: ", validName);
+
       console.log("-----------------------------------------------------");
+      try {
+        await axios.post(`${env.REACT_NATIVE_API_URL}/owner`, {
+          email,
+          password,
+          name,
+          date: date.toString().split("T")[0],
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
+  // DATA VALIDATION
   const validateEmail = (email: string): boolean => {
     if (email.match(emailRegex)?.length || [].length > 0) return true;
 
@@ -110,6 +141,7 @@ export default function Login() {
     if (password.trim().match(passwordStrong)) setPasswordStrength("Strong");
   };
 
+  // waiting for resolving M1 problems with opening gallery ios
   // const handleChoosePhoto = async () => {
   //   let result = await ImagePicker.launchImageLibraryAsync({
   //     mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -160,12 +192,18 @@ export default function Login() {
       <Text>{passwordStrength}</Text>
 
       <DateTimePicker
-        value={new Date()}
+        value={date}
         mode="date"
-        maximumDate={new Date()}
         display="default"
         style={styles.dateInput}
-        onChange={(date: Date) => {
+        maximumDate={
+          new Date(
+            new Date().getFullYear() - 16,
+            new Date().getMonth() + 1,
+            new Date().getDate() + 1
+          )
+        }
+        onChange={(ev: Event, date: Date) => {
           setDate(date);
         }}
       />
