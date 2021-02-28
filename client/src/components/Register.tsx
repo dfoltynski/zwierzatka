@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { NativeTouchEvent } from "react-native";
+import React, { useState, useEffect } from "react";
+import { NativeTouchEvent, Platform } from "react-native";
 import {
   StyleSheet,
   Text,
@@ -11,12 +11,15 @@ import { TextInput } from "react-native-gesture-handler";
 
 import RNPickerSelect from "react-native-picker-select";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import * as ImagePicker from "expo-image-picker";
 
 export default function Login() {
   const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
   const passwordMinimum = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   const passwordMid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
   const passwordStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+  const [image, setImage] = useState(null);
 
   const [name, setName] = useState<string>("");
   const [validName, setValidName] = useState<boolean>(true);
@@ -30,22 +33,55 @@ export default function Login() {
     ""
   );
 
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== "web") {
+        const {
+          status,
+        } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    })();
+  }, []);
+
   const [gender, setGender] = useState<string>("");
 
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
   const handleSubmit = (e: NativeSyntheticEvent<NativeTouchEvent>) => {
-    console.log("-----------------------------------------------------");
-    console.log("gender: ", gender);
-    console.log("email: ", email);
-    console.log("password: ", password);
-    console.log("date: ", date);
-    console.log("valid email: ", validEmail);
-    console.log("-----------------------------------------------------");
+    if (email === "") {
+      setValidEmail(false);
+    }
+    if (password === "") {
+      setValidPassword(false);
+    }
+    if (name === "") {
+      setValidName(false);
+    }
+
+    if (
+      email !== "" &&
+      validEmail &&
+      password !== "" &&
+      validPassword &&
+      name !== "" &&
+      validName &&
+      gender !== ""
+    ) {
+      console.log("-----------------------------------------------------");
+      console.log("gender: ", gender);
+      console.log("email: ", email);
+      console.log("password: ", password);
+      console.log("date: ", date);
+      console.log("valid email: ", validEmail);
+      console.log("-----------------------------------------------------");
+    }
   };
 
   const validateEmail = (email: string): boolean => {
-    if (email.match(emailRegex)?.length > 0) return true;
+    if (email.match(emailRegex)?.length || [].length > 0) return true;
 
     setValidEmail(false);
     return false;
@@ -74,6 +110,17 @@ export default function Login() {
     if (password.trim().match(passwordStrong)) setPasswordStrength("Strong");
   };
 
+  // const handleChoosePhoto = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.All,
+  //     allowsEditing: true,
+  //     aspect: [4, 3],
+  //     quality: 1,
+  //   });
+
+  //   console.log(result);
+  // };
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -82,7 +129,7 @@ export default function Login() {
         onChangeText={(name) => {
           if (validateName(name)) {
             setValidName(true);
-            setName(name);
+            setName(name.trim());
           }
         }}
       />
@@ -92,7 +139,7 @@ export default function Login() {
         onChangeText={(email) => {
           if (validateEmail(email)) {
             setValidEmail(true);
-            setEmail(email);
+            setEmail(email.trim());
           }
         }}
       />
@@ -104,7 +151,7 @@ export default function Login() {
           if (validatePassword(password)) {
             setValidPassword(true);
             checkPasswordStrength(password);
-            setPassword(password);
+            setPassword(password.trim());
           }
           checkPasswordStrength("");
         }}
@@ -118,7 +165,9 @@ export default function Login() {
         maximumDate={new Date()}
         display="default"
         style={styles.dateInput}
-        onChange={(ev: Event, date: Date) => setDate(date)}
+        onChange={(date: Date) => {
+          setDate(date);
+        }}
       />
 
       <RNPickerSelect
@@ -134,6 +183,8 @@ export default function Login() {
           { label: "Prefer not to say", value: "Prefer not to say" },
         ]}
       />
+
+      {/* <Button title="Choose your profile picture" onPress={handleChoosePhoto} /> */}
 
       <Button title="Log in" onPress={handleSubmit} />
     </View>
