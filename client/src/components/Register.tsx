@@ -15,11 +15,10 @@ import axios from "axios";
 // import * as ImagePicker from "expo-image-picker";
 
 import env from "../../config/env";
+import { validateEmail, validatePassword } from "../../utils/";
 
-export default function Register() {
-  // email and passowrd strength regexs
-
-  const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+export default function Register({ navigation }: any) {
+  // passowrd strength regexs
   const passwordMinimum = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   const passwordMid = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
   const passwordStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -113,27 +112,10 @@ export default function Register() {
   };
 
   // DATA VALIDATION
-  const validateEmail = (email: string): boolean => {
-    if (email.match(emailRegex)?.length || [].length > 0) return true;
-
-    setValidEmail(false);
-    return false;
-  };
-
   const validateName = (name: string): boolean => {
     if (name.trim().split(" ").length >= 2) return true;
 
     setValidName(false);
-    return false;
-  };
-
-  const validatePassword = (password: string): boolean => {
-    if (password.trim().match(passwordMinimum)) return true;
-    if (password.trim().match(passwordMid)) return true;
-    if (password.trim().match(passwordStrong)) return true;
-    setValidPassword(false);
-    setPasswordStrength(undefined);
-
     return false;
   };
 
@@ -174,6 +156,8 @@ export default function Register() {
           if (validateEmail(email)) {
             setValidEmail(true);
             setEmail(email.trim());
+          } else {
+            setValidEmail(false);
           }
         }}
       />
@@ -186,6 +170,9 @@ export default function Register() {
             setValidPassword(true);
             checkPasswordStrength(password);
             setPassword(password.trim());
+          } else {
+            setValidPassword(false);
+            setPasswordStrength(undefined);
           }
           checkPasswordStrength("");
         }}
@@ -226,7 +213,11 @@ export default function Register() {
 
       {/* <Button title="Choose your profile picture" onPress={handleChoosePhoto} /> */}
 
-      <Button title="Log in" onPress={handleSubmit} />
+      <Button title="Register" onPress={handleSubmit} />
+      <Button
+        title="Go home"
+        onPress={() => navigation.navigate("Select Sign in Method")}
+      />
     </View>
   );
 }
