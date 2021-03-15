@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import passport from "passport";
 import * as passportLocal from "passport-local";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 import db from "../dbConfig";
 
@@ -69,10 +70,26 @@ passport.deserializeUser((id, done) => {
 });
 
 const passportLogin = (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate("local", {
-    successRedirect: "/v1/authok",
-    failureRedirect: "/v1/authfail",
-  })(req, res, next);
+  passport.authenticate("local", { session: false }, (err, user, info) => {
+    if (err || !user) {
+      return res.status(400).json({
+        message: info ? info.message : "Login failed",
+        user: user,
+      });
+    }
+
+    req.login(user, { session: false }, (err) => {
+      if (err) res.send(err);
+    });
+
+    const token = jwt.sign(user, process.env.SECRET);
+    console.log(token);
+    return res.json({ user, token });
+  })(req, res);
+  // passport.authenticate("local", {
+  //   successRedirect: "/v1/authok",
+  //   failureRedirect: "/v1/authfail",
+  // })(req, res, next);
   // res.send("auth ok");
   // res.redirect("/v1/test-secret");
 };
