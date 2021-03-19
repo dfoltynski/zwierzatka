@@ -2,7 +2,7 @@ import express from "express";
 import {
   getTestData,
   createOwner,
-  passportLogin,
+  login,
   authOk,
   authFail,
   createPet,
@@ -20,7 +20,7 @@ router.get("/test-secret", isAuth, (req, res) => {
 
 router.post("/owner/", createOwner);
 
-router.post("/login/", passportLogin);
+router.post("/login/", login);
 
 router.post("/pet/", createPet);
 router.get("/pet/", getBasicPetData);
