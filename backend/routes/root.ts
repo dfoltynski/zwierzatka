@@ -11,12 +11,7 @@ import {
 
 const router = express.Router();
 
-import isAuth from "../utils/auth";
-
 router.get("/", getTestData);
-router.get("/test-secret", isAuth, (req, res) => {
-  res.send("treasure");
-});
 
 router.post("/owner/", createOwner);
 

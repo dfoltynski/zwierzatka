@@ -83,7 +83,7 @@ export default function Register({ navigation }: any) {
       gender !== ""
     ) {
       console.log(
-        `--------------------${env.REACT_NATIVE_API_URL}/owner-------------------------`
+        `--------------------${env.REACT_NATIVE_API_URL}/v1/owner-------------------------`
       );
       console.log({
         email,
@@ -98,7 +98,7 @@ export default function Register({ navigation }: any) {
 
       console.log("-----------------------------------------------------");
       try {
-        await axios.post(`${env.REACT_NATIVE_API_URL}/owner`, {
+        await axios.post(`${env.REACT_NATIVE_API_URL}/v1/owner`, {
           email,
           password,
           name,

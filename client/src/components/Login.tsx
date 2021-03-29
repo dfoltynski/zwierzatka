@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import env from "../../config/env";
 import { validateEmail, validatePassword } from "../../utils/";
@@ -15,21 +16,33 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState<boolean>(false);
 
   const handleSubmit = async () => {
-    const res = await axios.post(`${env.REACT_NATIVE_API_URL}/login`, {
-      email,
-      password,
-    });
-    if (res.data === "auth ok") {
-      console.log(email, password);
-      console.log(res.data);
-      setValidEmail(true);
-      setValidPassword(true);
-      setErrorMessage(false);
-    } else {
-      console.log(res.data);
-      setValidEmail(false);
-      setValidPassword(false);
-      setErrorMessage(true);
+    if (email && password) {
+      try {
+        const res = await axios.post(`http://localhost:8080/v1/login`, {
+          email: email || "",
+          password: password || "",
+        });
+
+        try {
+          await AsyncStorage.setItem("jwtToken", res.data.token);
+        } catch (error) {
+          Alert.alert(
+            "Something went wrong while saving token to AsyncStorage"
+          );
+          console.log(
+            "Something went wrong while saving token to AsyncStorage"
+          );
+        }
+
+        setValidEmail(true);
+        setValidPassword(true);
+        setErrorMessage(false);
+      } catch (error) {
+        console.log(error);
+        setValidEmail(false);
+        setValidPassword(false);
+        setErrorMessage(true);
+      }
     }
   };
 
@@ -37,6 +50,7 @@ export default function Login() {
     <View style={styles.container}>
       <TextInput
         style={validEmail ? styles.formTextInput : styles.invalidText}
+        autoCapitalize="none"
         placeholder="johndoe@example.com"
         onChangeText={(email) => {
           if (validateEmail(email)) {
@@ -50,6 +64,7 @@ export default function Login() {
       <TextInput
         style={validPassword ? styles.formTextInput : styles.invalidText}
         placeholder="password"
+        autoCapitalize="none"
         secureTextEntry={true}
         onChangeText={(password) => setPassword(password)}
       />

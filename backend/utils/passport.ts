@@ -16,6 +16,8 @@ module.exports = (passport: any) => {
     new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
       const query = `SELECT owner_id, email, password FROM Owner WHERE email LIKE '${email}'`;
 
+      console.log(email, password);
+
       let ownerObject: Owner = { id: 0, email: "", password: "" };
 
       db.query(query, (err, data) => {

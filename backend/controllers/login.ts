@@ -20,7 +20,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
       expiresIn: "1h",
     });
     console.log(token);
-    return res.json({ user, token });
+    return res.status(200).json({ user, token });
   })(req, res, next);
 };
 
