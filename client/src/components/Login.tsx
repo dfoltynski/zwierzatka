@@ -6,7 +6,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import env from "../../config/env";
 import { validateEmail, validatePassword } from "../../utils/";
 
-export default function Login() {
+export default function Login({ navigation }: any) {
   const [email, setEmail] = useState<string>("");
   const [validEmail, setValidEmail] = useState<boolean>(true);
 
@@ -25,6 +25,8 @@ export default function Login() {
 
         try {
           await AsyncStorage.setItem("jwtToken", res.data.token);
+          navigation.reset({ index: 0, routes: [{ name: "Profile" }] });
+          navigation.navigate("Profile");
         } catch (error) {
           Alert.alert(
             "Something went wrong while saving token to AsyncStorage"

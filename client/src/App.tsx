@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import { Register, SelectSigninMethod, Login } from "./components/";
+import { Register, SelectSigninMethod, Login, Profile } from "./components/";
 
 const Stack = createStackNavigator();
 
@@ -17,6 +17,7 @@ export default function App() {
           component={SelectSigninMethod}
         />
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Profile" component={Profile} />
         {/* <View style={styles.container}> */}
         {/* <Register /> */}
         {/* </View> */}
