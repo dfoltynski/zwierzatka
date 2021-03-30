@@ -1,31 +1,8 @@
-import React, { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect } from "react";
 import { Text, Button, View, StyleSheet, Alert } from "react-native";
-import axios from "axios";
+import { checkForJwtToken } from "../../utils";
 
 const SelectSigninMethod = ({ navigation }: any) => {
-  const [isTokenValid, setIsTokenValid] = useState<boolean>(false);
-
-  const checkForJwtToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("jwtToken");
-      try {
-        const res = await axios.get("http://localhost:8080/authed/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        // setIsTokenValid(true);
-        console.log(token);
-        return true;
-      } catch (error) {
-        return false;
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const redirectToProfile = () => {
     navigation.reset({ index: 0, routes: [{ name: "Profile" }] });
     navigation.navigate("Profile");

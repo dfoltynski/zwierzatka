@@ -16,11 +16,11 @@ const login = (req: Request, res: Response, next: NextFunction) => {
       if (err) res.send(err);
     });
 
-    const token = jwt.sign(user, process.env.SECRET, {
-      expiresIn: "1h",
+    const token = jwt.sign({ id: user.id }, process.env.SECRET, {
+      expiresIn: "30m",
     });
     console.log(token);
-    return res.status(200).json({ user, token });
+    return res.status(200).json({ token });
   })(req, res, next);
 };
 

@@ -3,8 +3,8 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import env from "../../config/env";
 import { validateEmail, validatePassword } from "../../utils/";
+import env from "../../config/env";
 
 export default function Login({ navigation }: any) {
   const [email, setEmail] = useState<string>("");
@@ -18,7 +18,7 @@ export default function Login({ navigation }: any) {
   const handleSubmit = async () => {
     if (email && password) {
       try {
-        const res = await axios.post(`http://localhost:8080/v1/login`, {
+        const res = await axios.post(`${env.REACT_NATIVE_API_URL}/v1/login`, {
           email: email || "",
           password: password || "",
         });
