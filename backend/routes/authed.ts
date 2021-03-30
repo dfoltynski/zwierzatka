@@ -20,6 +20,7 @@ router.get("/user", (req, res) => {
       {
         pet_name: string;
         pet_birth: Date;
+        pet_breed: string;
         pet_gender: string;
         pet_photo: Buffer;
       }
@@ -45,7 +46,8 @@ router.get("/user", (req, res) => {
         owner.pet.push({
           pet_name: pet.pet_name,
           pet_birth: pet.pet_birth,
-          pet_gender: pet.breed,
+          pet_breed: pet.breed,
+          pet_gender: pet.pet_gender,
           pet_photo: pet.photo,
         });
       });
