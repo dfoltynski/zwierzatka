@@ -52,7 +52,7 @@ router.get("/user", (req, res) => {
         });
       });
 
-      console.log(owner);
+      // console.log(owner);
       res.status(200).json(owner);
     }
   );

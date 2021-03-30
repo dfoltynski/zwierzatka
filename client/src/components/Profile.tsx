@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Alert,
   Image,
-  ImageSourcePropType,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -15,6 +14,7 @@ import getUserData from "../../utils/getUserData/getUserData";
 import { encode } from "base64-arraybuffer";
 import { decode } from "base-64";
 import { ScrollView } from "react-native-gesture-handler";
+import { checkForJwtToken } from "../../utils";
 
 export default function Profile({ navigation }: any) {
   const [user, setUser] = useState<IUser>({
@@ -33,12 +33,11 @@ export default function Profile({ navigation }: any) {
   }
 
   interface IPet {
-    [key: string]: {
-      pet_name: string;
-      pet_birth: string;
-      pet_gender: string;
-      pet_photo?: string;
-    };
+    pet_breed: string;
+    pet_name: string;
+    pet_birth: string;
+    pet_gender: string;
+    pet_photo?: string;
   }
 
   useEffect(() => {
@@ -57,22 +56,44 @@ export default function Profile({ navigation }: any) {
         photo: encodedProfilePictureUrl,
       });
 
+      const petsWithoutAnyRepeats = new Set();
+
       userRes.pet.forEach((pet: any) => {
         const encodedetPictureUrl = decode(encode(pet.pet_photo.data));
 
-        setPet((oldPet) => [
-          ...oldPet,
-          {
-            pet_name: pet.pet_name,
-            pet_birth: pet.pet_birth.toString().split("T")[0],
-            pet_gender: pet.pet_gender,
-            pet_breed: pet.pet_breed,
-            pet_photo: encodedetPictureUrl,
-          },
-        ]);
+        petsWithoutAnyRepeats.add({
+          pet_name: pet.pet_name,
+          pet_birth: pet.pet_birth.toString().split("T")[0],
+          pet_gender: pet.pet_gender,
+          pet_breed: pet.pet_breed,
+          pet_photo: encodedetPictureUrl,
+        });
+
+        setPet([...petsWithoutAnyRepeats]);
       });
+
+      // petsWithoutAnyRepeats.forEach((pet) => {
+      //   console.log(pet.pet_name);
+      //   console.log(pet.pet_breed);
+      //   console.log(pet.pet_birth);
+      //   console.log(pet.pet_gender);
+      //   console.log(pet.pet_photo);
+      // });
     })();
   }, []);
+
+  const asd = () => {
+    // { pet_name, pet_breed, pet_gender, pet_photo, pet_birth }
+
+    pet.map((pet: IPet) => {
+      console.log("--------------------------------");
+      console.log(pet.pet_name);
+      console.log(pet.pet_breed);
+      console.log(pet.pet_birth);
+      console.log(pet.pet_gender);
+      console.log(pet.pet_photo);
+    });
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -84,18 +105,27 @@ export default function Profile({ navigation }: any) {
       <Text>{user.photo} asd</Text>
       <Image style={styles.tinyLogo} source={{ uri: user.photo }}></Image>
 
-      {pet.map((pet) => (
+      {pet.map((pet: IPet) => (
         <>
-          <Text>{pet.pet_name}</Text>
-          <Text>{pet.pet_breed}</Text>
-          <Text>{pet.pet_birth}</Text>
-          <Text>{pet.pet_gender}</Text>
+          <Text key={pet.pet_name}>{pet.pet_name}</Text>
+          <Text key={pet.pet_breed}>{pet.pet_breed}</Text>
+          <Text key={pet.pet_birth}>{pet.pet_birth}</Text>
+          <Text key={pet.pet_gender}>{pet.pet_gender}</Text>
+
           <Image
+            key={pet.pet_photo}
             style={styles.tinyLogo}
             source={{ uri: pet.pet_photo }}
           ></Image>
         </>
       ))}
+
+      <Button
+        title="Logout"
+        onPress={() => {
+          asd();
+        }}
+      />
     </ScrollView>
   );
 }
