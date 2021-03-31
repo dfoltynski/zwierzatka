@@ -15,10 +15,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
     req.login(user, { session: false }, (err) => {
       if (err) res.send(err);
     });
-
-    const token = jwt.sign({ id: user.id }, process.env.SECRET, {
-      expiresIn: "10s",
-    });
+    const token = jwt.sign({ id: user.id }, process.env.SECRET); // there is no expiresIn cuz it's a native mobile app
     console.log(token);
     return res.status(200).json({ token });
   })(req, res, next);

@@ -14,7 +14,6 @@ import getUserData from "../../utils/getUserData/getUserData";
 import { encode } from "base64-arraybuffer";
 import { decode } from "base-64";
 import { ScrollView } from "react-native-gesture-handler";
-import { checkForJwtToken } from "../../utils";
 
 export default function Profile({ navigation }: any) {
   const [user, setUser] = useState<IUser>({
@@ -42,67 +41,55 @@ export default function Profile({ navigation }: any) {
 
   useEffect(() => {
     (async () => {
-      if (await checkForJwtToken()) {
-        const token = await AsyncStorage.getItem("jwtToken");
-        const userRes = await getUserData(token);
-        const encodedProfilePictureUrl = decode(
-          encode(userRes.profile_picture.data)
-        );
-        // console.log(encodedProfilePictureUrl);
+      const token = await AsyncStorage.getItem("jwtToken");
+      const userRes = await getUserData(token);
+      const encodedProfilePictureUrl = decode(
+        encode(userRes.profile_picture.data)
+      );
 
-        setUser({
-          name: userRes.name,
-          birth: userRes.birth.toString().split("T")[0],
-          gender: userRes.gender,
-          photo: encodedProfilePictureUrl,
+      setUser({
+        name: userRes.name,
+        birth: userRes.birth.toString().split("T")[0],
+        gender: userRes.gender,
+        photo: encodedProfilePictureUrl,
+      });
+
+      const petsWithoutAnyRepeats = new Set();
+
+      userRes.pet.forEach((pet: any) => {
+        const encodedetPictureUrl = decode(encode(pet.pet_photo.data));
+
+        petsWithoutAnyRepeats.add({
+          pet_name: pet.pet_name,
+          pet_birth: pet.pet_birth.toString().split("T")[0],
+          pet_gender: pet.pet_gender,
+          pet_breed: pet.pet_breed,
+          pet_photo: encodedetPictureUrl,
         });
 
-        const petsWithoutAnyRepeats = new Set();
-
-        userRes.pet.forEach((pet: any) => {
-          const encodedetPictureUrl = decode(encode(pet.pet_photo.data));
-
-          petsWithoutAnyRepeats.add({
-            pet_name: pet.pet_name,
-            pet_birth: pet.pet_birth.toString().split("T")[0],
-            pet_gender: pet.pet_gender,
-            pet_breed: pet.pet_breed,
-            pet_photo: encodedetPictureUrl,
-          });
-
-          setPet([...petsWithoutAnyRepeats]);
-        });
-
-        // petsWithoutAnyRepeats.forEach((pet) => {
-        //   console.log(pet.pet_name);
-        //   console.log(pet.pet_breed);
-        //   console.log(pet.pet_birth);
-        //   console.log(pet.pet_gender);
-        //   console.log(pet.pet_photo);
-        // });
-      } else {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Select Sign in Method" }],
-        });
-        navigation.navigate("Select Sign in Method", {
-          message: "You've been idle for too long",
-        });
-      }
+        setPet([...petsWithoutAnyRepeats]);
+      });
     })();
   }, []);
 
   const logout = () => {
-    // { pet_name, pet_breed, pet_gender, pet_photo, pet_birth }
+    (async () => {
+      try {
+        await AsyncStorage.removeItem("jwtToken");
 
-    pet.map((pet: IPet) => {
-      console.log("--------------------------------");
-      console.log(pet.pet_name);
-      console.log(pet.pet_breed);
-      console.log(pet.pet_birth);
-      console.log(pet.pet_gender);
-      console.log(pet.pet_photo);
-    });
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Select Sign in Method" }],
+        });
+        navigation.navigate("Select Sign in Method");
+      } catch (error) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Select Sign in Method" }],
+        });
+        navigation.navigate("Select Sign in Method");
+      }
+    })();
   };
 
   return (
@@ -129,22 +116,7 @@ export default function Profile({ navigation }: any) {
         </>
       ))}
 
-      <Button
-        title="Logout"
-        onPress={async () => {
-          if (await checkForJwtToken()) {
-            logout();
-          } else {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "Select Sign in Method" }],
-            });
-            navigation.navigate("Select Sign in Method", {
-              message: "You've been idle for too long",
-            });
-          }
-        }}
-      />
+      <Button title="Logout" onPress={logout} />
     </ScrollView>
   );
 }
