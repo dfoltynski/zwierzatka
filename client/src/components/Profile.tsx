@@ -42,47 +42,57 @@ export default function Profile({ navigation }: any) {
 
   useEffect(() => {
     (async () => {
-      const token = await AsyncStorage.getItem("jwtToken");
-      const userRes = await getUserData(token);
-      const encodedProfilePictureUrl = decode(
-        encode(userRes.profile_picture.data)
-      );
-      // console.log(encodedProfilePictureUrl);
+      if (await checkForJwtToken()) {
+        const token = await AsyncStorage.getItem("jwtToken");
+        const userRes = await getUserData(token);
+        const encodedProfilePictureUrl = decode(
+          encode(userRes.profile_picture.data)
+        );
+        // console.log(encodedProfilePictureUrl);
 
-      setUser({
-        name: userRes.name,
-        birth: userRes.birth.toString().split("T")[0],
-        gender: userRes.gender,
-        photo: encodedProfilePictureUrl,
-      });
-
-      const petsWithoutAnyRepeats = new Set();
-
-      userRes.pet.forEach((pet: any) => {
-        const encodedetPictureUrl = decode(encode(pet.pet_photo.data));
-
-        petsWithoutAnyRepeats.add({
-          pet_name: pet.pet_name,
-          pet_birth: pet.pet_birth.toString().split("T")[0],
-          pet_gender: pet.pet_gender,
-          pet_breed: pet.pet_breed,
-          pet_photo: encodedetPictureUrl,
+        setUser({
+          name: userRes.name,
+          birth: userRes.birth.toString().split("T")[0],
+          gender: userRes.gender,
+          photo: encodedProfilePictureUrl,
         });
 
-        setPet([...petsWithoutAnyRepeats]);
-      });
+        const petsWithoutAnyRepeats = new Set();
 
-      // petsWithoutAnyRepeats.forEach((pet) => {
-      //   console.log(pet.pet_name);
-      //   console.log(pet.pet_breed);
-      //   console.log(pet.pet_birth);
-      //   console.log(pet.pet_gender);
-      //   console.log(pet.pet_photo);
-      // });
+        userRes.pet.forEach((pet: any) => {
+          const encodedetPictureUrl = decode(encode(pet.pet_photo.data));
+
+          petsWithoutAnyRepeats.add({
+            pet_name: pet.pet_name,
+            pet_birth: pet.pet_birth.toString().split("T")[0],
+            pet_gender: pet.pet_gender,
+            pet_breed: pet.pet_breed,
+            pet_photo: encodedetPictureUrl,
+          });
+
+          setPet([...petsWithoutAnyRepeats]);
+        });
+
+        // petsWithoutAnyRepeats.forEach((pet) => {
+        //   console.log(pet.pet_name);
+        //   console.log(pet.pet_breed);
+        //   console.log(pet.pet_birth);
+        //   console.log(pet.pet_gender);
+        //   console.log(pet.pet_photo);
+        // });
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Select Sign in Method" }],
+        });
+        navigation.navigate("Select Sign in Method", {
+          message: "You've been idle for too long",
+        });
+      }
     })();
   }, []);
 
-  const asd = () => {
+  const logout = () => {
     // { pet_name, pet_breed, pet_gender, pet_photo, pet_birth }
 
     pet.map((pet: IPet) => {
@@ -98,7 +108,6 @@ export default function Profile({ navigation }: any) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text>Welcome</Text>
-
       <Text>{user.name}</Text>
       <Text>{user.birth}</Text>
       <Text>{user.gender}</Text>
@@ -122,8 +131,18 @@ export default function Profile({ navigation }: any) {
 
       <Button
         title="Logout"
-        onPress={() => {
-          asd();
+        onPress={async () => {
+          if (await checkForJwtToken()) {
+            logout();
+          } else {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "Select Sign in Method" }],
+            });
+            navigation.navigate("Select Sign in Method", {
+              message: "You've been idle for too long",
+            });
+          }
         }}
       />
     </ScrollView>
